@@ -1,5 +1,8 @@
 <?php 
 
+/**
+ * MaileAlive
+ */
 class MaileAlive  {
 
     public $to_server_port;
@@ -7,13 +10,26 @@ class MaileAlive  {
     public $to_mail_adr;
     public $from_mail_adr;
     public $dbg_mode;
-
+    
+    /**
+     * init
+     *
+     * @param  mixed $send_mail_adr
+     * @param  mixed $to_mail_adr
+     * @param  mixed $dbg_mode
+     * @return void
+     */
     function init($send_mail_adr, $to_mail_adr, $dbg_mode=false){
         $this->to_mail_adr = $to_mail_adr;
         $this->from_mail_adr = $send_mail_adr;
         $this->dbg_mode = $dbg_mode;
     }
-
+    
+    /**
+     * process
+     *
+     * @return void
+     */
     function process() {
         // メールサーバーを取得
         $this->to_server_url = $this->get_to_server_url($this->to_mail_adr);
@@ -70,7 +86,14 @@ class MaileAlive  {
         return $user_known_response_code;
 
     }
-
+    
+    /**
+     * get_socket
+     *
+     * @param  mixed $socket
+     * @param  mixed $length
+     * @return void
+     */
     function get_socket($socket,$length=1024){
         $send = '';
         $sr = fgets($socket,$length);
@@ -81,11 +104,25 @@ class MaileAlive  {
         }
         return $send;
     }
-
+    
+    /**
+     * put_socket
+     *
+     * @param  mixed $socket
+     * @param  mixed $cmd
+     * @param  mixed $length
+     * @return void
+     */
     function put_socket($socket,$cmd,$length=1024){
         fputs($socket,$cmd."\r\n",$length);
     }
-
+    
+    /**
+     * get_to_server_url
+     *
+     * @param  mixed $email
+     * @return void
+     */
     function get_to_server_url($email) {
         $url = '';
         $domain = substr($email, strrpos($email, '@') + 1);
@@ -105,7 +142,13 @@ class MaileAlive  {
 
         return $_server_url;
     }
-
+    
+    /**
+     * get_to_mx_record
+     *
+     * @param  mixed $domain
+     * @return void
+     */
     function get_to_mx_record($domain) {
         $mxhosts = array();
         $checkDomain = getmxrr($domain, $mxhosts);
@@ -120,7 +163,13 @@ class MaileAlive  {
         }
         return $mxhosts[0];
     }
-
+    
+    /**
+     * get_to_server_port
+     *
+     * @param  mixed $email
+     * @return void
+     */
     function get_to_server_port($email) {
         $port = 0;
         $domain = substr($email, strrpos($email, '@') + 1);
@@ -138,7 +187,13 @@ class MaileAlive  {
 
         return $port;
     }
-
+    
+    /**
+     * dbg_print
+     *
+     * @param  mixed $str
+     * @return void
+     */
     function dbg_print($str) {
         if($this->dbg_mode)
             print('dbg: ' . $str . "\n");
@@ -167,6 +222,7 @@ $obj = new MaileAlive();
 $obj->init($from_mail_adr, $to_mail_adr, $dbg_mode);
 $response_code = $obj->process();
 
+// 画面にフォーマットを出力
 print($response_code)
 
 ?>
