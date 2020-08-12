@@ -200,9 +200,4 @@ class MaileAlive  {
     }
 }
 
-if(count($argv) < 3) {
-    echo "引数が不正です:" . $argv . ":\n";
-    exit(-1);
-} 
-
 ?>
