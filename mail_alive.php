@@ -2,11 +2,11 @@
 
 class MaileAlive  {
 
-    static $to_server_port;
-    static $to_server_url;
-    static $to_mail_adr;
-    static $from_mail_adr;
-    static $dbg_mode;
+    public $to_server_port;
+    public $to_server_url;
+    public $to_mail_adr;
+    public $from_mail_adr;
+    public $dbg_mode;
 
     function init($send_mail_adr, $to_mail_adr, $dbg_mode=false){
         $this->to_mail_adr = $to_mail_adr;
@@ -20,43 +20,70 @@ class MaileAlive  {
         $this->dbg_print("to server_url:" . $this->to_server_url);
 
         // ポート番号取得
-        $this->to_server_port = 587;
+        $this->to_server_port = $this->get_to_server_port($this->to_mail_adr);;
 
         // ソケットオープン
         $sock = fsockopen($this->to_server_url, $this->to_server_port);
+        $result = $this->get_socket($sock);
+        $this->dbg_print( 'result: socketopen:' . $result );
 
-        // helo
-        fputs($sock,"EHLO $this->to_server_url\r\n");
-        $result = fgets($sock,512);
-        $this->dbg_print( 'result: helo:' . $result );
+        // EHLO
+        $this->put_socket($sock,"EHLO $this->to_server_url");
+        $result = $this->get_socket($sock);
+        $this->dbg_print( 'result: helo1:' . $result );
 
         // セッションがSTARTTLSなら専用のハンドリングを実施
         if($this->to_server_port == 587) {
-            fputs($sock,"STARTTLS \r\n");
-            $result = fgets($sock,512);
+            $this->put_socket($sock,"STARTTLS");
+            $result = $this->get_socket($sock);
             $this->dbg_print('result: starttls:' . $result );
 
+            // if(false == stream_socket_enable_crypto($sock, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)){
+            //     // fclose($smtp); // unsure if you need to close as I haven't run into a security fail at this point
+            //     die("unable to start tls encryption");
+            // }
             // re helo
-            fputs($sock,"EHLO  $this->to_server_url\r\n");
-            $result = fgets($sock,512);
-            $this->dbg_print( 'result: helo:' . $result );
+            $this->put_socket($sock,"EHLO  $this->to_server_url");
+            $result = $this->get_socket($sock);
+            $this->dbg_print( 'result: helo2:' . $result );
         }
 
         // mail from
-        fputs($sock,"MAIL FROM:<$this->from_mail_adr>\r\n");
-        $result = fgets($sock,512);
+        $this->put_socket($sock,"MAIL FROM:<$this->from_mail_adr>");
+        $result = $this->get_socket($sock);
         $this->dbg_print( 'result: from:' . $result);
 
         // mail to
-        fputs($sock,"RCPT TO:<$this->to_mail_adr>\r\n");
-        $result = fgets($sock,512);
+        $this->put_socket($sock,"RCPT TO:<$this->to_mail_adr>");
+        $result = $this->get_socket($sock);
         $this->dbg_print('result: rept to:' . $result);
 
+        $user_known_msg = $result;
+
+        $this->put_socket($sock,"QUIT");
+        $result = $this->get_socket($sock);
+        $this->dbg_print('result: QUIT:' . $result);
+
         // レスポンスを取得して返却
-        $user_known_response_code = $result;
+        $user_known_response_code = substr($user_known_msg, 0, 3 );
 
         return $user_known_response_code;
 
+    }
+
+    function get_socket($socket,$length=1024){
+        $send = '';
+        $sr = fgets($socket,$length);
+        while( $sr ){
+            $send .= $sr;
+            if( $sr[3] != '-' ){ break; }
+            $sr = fgets($socket,$length);
+        }
+        return $send;
+    }
+
+    function put_socket($socket,$cmd,$length=1024){
+        fputs($socket,$cmd."\r\n",$length);
     }
 
     function get_to_server_url($email) {
@@ -65,10 +92,10 @@ class MaileAlive  {
 
         $_server_url = '';
         switch ($domain) {
-            case 'gmail.com':
-                # code...
-                $_server_url = 'smtp.gmail.com';
-                break;
+            // case 'gmail.com':
+            //     # code...
+            //     $_server_url = 'smtp.gmail.com';
+            //      break;
 
             default:
                 # code...
@@ -94,8 +121,21 @@ class MaileAlive  {
         return $mxhosts[0];
     }
 
-    function get_to_server_port() {
+    function get_to_server_port($email) {
         $port = 0;
+        $domain = substr($email, strrpos($email, '@') + 1);
+
+        $_server_url = '';
+        switch ($domain) {
+            case 'gmail.com':
+                $port = 25;
+                 break;
+
+            default:
+                $port = 25;
+                break;
+        }
+
         return $port;
     }
 
@@ -125,6 +165,8 @@ if($dbg_mode) {
 
 $obj = new MaileAlive();
 $obj->init($from_mail_adr, $to_mail_adr, $dbg_mode);
-$obj->process();
+$response_code = $obj->process();
+
+print($response_code)
 
 ?>
