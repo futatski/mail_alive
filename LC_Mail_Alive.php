@@ -40,6 +40,10 @@ class MaileAlive  {
 
         // ソケットオープン
         $sock = fsockopen($this->to_server_url, $this->to_server_port);
+        if($sock == false){
+            return -1;
+        }
+
         $result = $this->get_socket($sock);
         $this->dbg_print( 'result: socketopen:' . $result );
 
