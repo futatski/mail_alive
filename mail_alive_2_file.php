@@ -52,7 +52,7 @@ foreach ($read_data as $key => $value) {
     print($value[0] . "," . $value[1] . "," . $response_code . "\n");
 }
 
-print('finished.........................')
+print('finished.........................\n')
 
 
 
