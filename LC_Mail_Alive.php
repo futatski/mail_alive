@@ -165,6 +165,10 @@ class MaileAlive  {
                 return -1;
             }
         }
+        if(count($mxhosts) == 0) {
+            return -1;
+        }
+
         return $mxhosts[0];
     }
     
