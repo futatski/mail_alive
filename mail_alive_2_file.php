@@ -35,10 +35,18 @@ $row = 1;
 if (($handle = fopen($csv_name, "r")) !== FALSE) {
     // 1行ずつfgetcsv()関数を使って読み込む
     while (($data = fgetcsv($handle))) {
-        $read_data[$row] = $data;
-        if($dbg_mode) {
-            print("read:" . $row . ":" . $read_data[$row][0] . "," . $read_data[$row][1]);
+        if(count($data) == 0 || $data[0] == '#') {
+            if($dbg_mode) {
+                print("skip read:\n");
+            }
         }
+        else {
+                $read_data[$row] = $data;
+            if($dbg_mode) {
+                print("read:" . $row . ":" . $read_data[$row][0] . "," . $read_data[$row][1] . "\n");
+            }
+        }
+
         $row++;
     }
     fclose($handle);
