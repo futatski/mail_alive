@@ -9,7 +9,16 @@ if(count($argv) < 2) {
 
 $csv_name = $argv[1]; // 対象となるCSV
 
+// 送信元(省略可)
 if(count($argv) >= 3 && $argv[2] != "") {
+    $to_email = $argv[2];
+}
+else {
+    $to_email = "test@example.com";
+}
+
+// デバッグモード
+if(count($argv) >= 4 && $argv[3] != "") {
     $dbg_mode = true;
 }
 else {
@@ -45,7 +54,7 @@ if($dbg_mode) {
 $obj = new MaileAlive();
 foreach ($read_data as $key => $value) {
     $from_mail_adr = $value[1];
-    $obj->init("test@example.com",$from_mail_adr, false);
+    $obj->init($to_email,$from_mail_adr, false);
     $response_code = $obj->process();
 
     // 画面にフォーマットを出力
