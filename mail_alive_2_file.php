@@ -40,15 +40,8 @@ if (($handle = fopen($csv_name, "r")) !== FALSE) {
             print("read:" . $row . ":" . $read_data[$row][0] . "," . $read_data[$row][1]);
         }
         $row++;
-        if($dbg_mode) {
-    print("--------------->" . $row . "read data.\n");
-}
     }
     fclose($handle);
-}
-
-if($dbg_mode) {
-    print("--------------->" . $row . "read data.\n");
 }
 
 $obj = new MaileAlive();
