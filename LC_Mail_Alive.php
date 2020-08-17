@@ -88,7 +88,8 @@ class MaileAlive  {
         $this->dbg_print('result: QUIT:' . $result);
 
         // レスポンスを取得して返却
-        $user_known_response_code = substr($user_known_msg, 0, 3 );
+//        $user_known_response_code = substr($user_known_msg, 0, 3 );
+        $user_known_response_code = $user_known_msg;
 
         return $user_known_response_code;
 
