@@ -34,6 +34,9 @@ class MaileAlive  {
         // メールサーバーを取得
         $this->to_server_url = $this->get_to_server_url($this->to_mail_adr);
         $this->dbg_print("to server_url:" . $this->to_server_url);
+        if($this->to_server_url == -1) {
+            return -1;
+        }
 
         // ポート番号取得
         $this->to_server_port = $this->get_to_server_port($this->to_mail_adr);;
