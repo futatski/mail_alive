@@ -59,7 +59,7 @@ foreach ($read_data as $key => $value) {
     $response_code = $obj->process();
 
     // 画面にフォーマットを出力
-    print($value[0] . "," . $value[1] . "," . $response_code . "\n");
+    print($value[0] . "," . $value[1] . "," . str_replace("\r\n", ' ', $response_code) . "\n");
 }
 
 print('finished.........................' . "\n")
