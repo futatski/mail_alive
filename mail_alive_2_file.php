@@ -62,7 +62,7 @@ foreach ($read_data as $key => $value) {
     print($value[0] . "," . $value[1] . "," . str_replace("\r\n", ' ', $response_code) . "\n");
 }
 
-print('finished.........................' . "\n")
+print('finished.........................' . "\n");
 
 
 
